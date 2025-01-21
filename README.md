@@ -4,7 +4,7 @@ Welcome to **TruffleHog Explorer**, a user-friendly web-based tool to visualize 
 
 With an improved UI/UX, powerful filtering options, and export capabilities, this tool helps security professionals efficiently review potential secrets and credentials found in their repositories.
 
-⚠️ This dashboard has been tested only with GitHub TruffleHog JSON outputs. Expect updates soon to support additional formats and platforms.
+> ⚠️ This dashboard has been tested only with GitHub TruffleHog JSON outputs. Expect updates soon to support additional formats and platforms.
 
 
 ![TruffleHog Explorer Screenshot](static/screenshot.png)
