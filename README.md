@@ -70,9 +70,7 @@ $ open index.html
    - Save your session and resume later without losing any progress.
    - Automatic backup feature to prevent data loss.
 
----
 
-## 📊 Screenshots
 ---
 
 **Happy Securing! 🔒**
