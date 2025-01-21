@@ -73,9 +73,6 @@ $ open index.html
 ---
 
 ## 📊 Screenshots
-
-![TruffleHog Explorer UI](static/screenshot_ui.png)
-
 ---
 
 **Happy Securing! 🔒**
