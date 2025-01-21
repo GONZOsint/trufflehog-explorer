@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>TruffleHog Results - Improved UI/UX</title>
+
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="static/icon.png" />
+
+  <!-- CUSTOM FONT: Poppins from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- FLATPICKR DATE RANGE PICKER (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <!-- BOOTSTRAP ICONS (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <style>
+    /*********************************
+     * GLOBAL & BASIC LAYOUT
+     *********************************/
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: #555;
+      line-height: 1.6;
+      min-height: 100vh;
+      /* Softer pink-to-purple background */
+      background: linear-gradient(135deg, #fdf7fc 0%, #fcf0fd 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /*********************************
+     * HEADER
+     *********************************/
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(45deg, #E1A8D7 0%, #CEB8E7 100%);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      padding: 1.2rem 0;
+      margin-bottom: 1rem;
+    }
+    header img {
+      width: 70px;
+      height: 70px;
+      margin-right: 10px;
+    }
+    header h1 {
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      font-size: 1.5rem;
+    }
+
+    .layout {
+      display: flex;
+      flex: 1 0 auto;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /*********************************
+     * SIDEBAR
+     *********************************/
+    .sidebar {
+      flex: 0 0 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background-color: #ffffffcc;
+      border: 1px solid #ecdff0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .sidebar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 15px 0;
+      border-bottom: 1px solid #f1e3f4;
+    }
+    .sidebar-section:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .sidebar-section h2 {
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      color: #b56cc2;
+      position: relative;
+    }
+    .sidebar-section h2::after {
+      content: '';
+      display: block;
+      width: 30px;
+      height: 3px;
+      background: #b56cc2;
+      margin-top: 6px;
+      border-radius: 2px;
+    }
+
+    /*********************************
+     * UPLOAD SECTION
+     *********************************/
+    .upload-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .file-input {
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid #e3c2d5;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #fff;
+      transition: box-shadow 0.2s ease;
+    }
+    .file-input:hover {
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .upload-group p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /*********************************
+     * MAIN CONTENT
+     *********************************/
+    .main-content {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    /* Stats Container */
+    .stats-container {
+      background-color: #ffffffcc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #ecdff0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.3s ease;
+    }
+    .stats-container:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    }
+    .stats-container h2 {
+      color: #b56cc2;
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+    }
+    .stats-grid {
+      /* 4 columns -> we have 8 cards => 2 rows of 4 columns each */
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stats-detail {
+      padding: 10px;
+      border-radius: 0.25rem;
+      background-color: #fff;
+      border: 1px solid #f1e3f4;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .stats-detail strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: #444;
+    }
+    .filtered-count {
+      text-align: center;
+      font-weight: 500;
+      margin-top: 0.5rem;
+      color: #666;
+    }
+
+    /* Verification bar */
+    .verification-stats {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .verification-stats p {
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #666;
+    }
+    .verification-bar-container {
+      background-color: #f3e2eb;
+      border-radius: 4px;
+      overflow: hidden;
+      height: 12px;
+      margin: 0 auto;
+      max-width: 300px;
+      position: relative;
+    }
+    .verification-bar {
+      /* Pink bar for verified/unverified ratio */
+      background-color: #f7c7db;
+      height: 12px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Results Container */
+    #results-container p {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #666;
+    }
+
+    /*********************************
+     * FILTERS
+     *********************************/
+    .controls-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .controls-container label {
+      font-weight: 500;
+      margin-bottom: 5px;
+      display: inline-block;
+      color: #555;
+    }
+    .info-icon {
+      font-weight: bold;
+      cursor: help;
+      margin-left: 4px;
+      color: #888;
+    }
+    .controls-container select,
+    .controls-container input[type="text"] {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border: 1px solid #d8cfe0;
+      border-radius: 0.25rem;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #fff;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%23555" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 16px;
+      appearance: none;
+      transition: box-shadow 0.2s ease;
+      color: #555;
+    }
+    .controls-container select:focus,
+    .controls-container input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    /*********************************
+     * BUTTONS (Pastel Pink/White/Purple)
+     *********************************/
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn + .btn {
+      margin-left: 0px;
+    }
+    .btn:hover {
+      opacity: 0.9;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    /* Pink (Danger) */
+    .btn-danger {
+      background-color: #f7c7db;
+      color: #5c4150; /* a darker mauve for text */
+    }
+    /* White (Warning) */
+    .btn-warning {
+      background-color: #fff;
+      color: #aa6baa;
+      border: 1px solid #d8cfe0;
+    }
+    /* Purple (Info) */
+    .btn-info {
+      background-color: #d7c3ea;
+      color: #4a375a;
+    }
+    /* Pinkish Purple (Secondary) */
+    .btn-secondary {
+      background-color: #eac6f2;
+      color: #4a375a;
+    }
+
+    /*********************************
+     * ACTIONS GROUP
+     *********************************/
+    .actions-group {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .actions-group h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: #444;
+    }
+    .buttons-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    /*********************************
+     * RESULT CARDS
+     *********************************/
+    .result-container {
+      background-color: #ffffffcc;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ecdff0;
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      animation: fadeIn 0.5s ease-out forwards;
+      position: relative;
+    }
+    .result-container:hover {
+      transform: scale(1.01);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    }
+    .collapsed .result-body {
+      display: none;
+    }
+    .result-header {
+      font-size: 1rem;
+      color: #b56cc2;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid #f1e3f4;
+      padding-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .result-header .title {
+      font-weight: 600;
+    }
+
+    .summary-line {
+      display: none;
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 6px;
+    }
+    .collapsed .summary-line {
+      display: block; /* show minimal info in collapsed mode */
+    }
+
+    .result-body {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      font-size: 0.85rem;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .result-detail {
+      word-break: break-word;
+      background-color: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 6px;
+      color: #555;
+    }
+    .result-detail strong {
+      font-weight: 600;
+      color: #444;
+      display: block;
+      margin-bottom: 3px;
+      font-size: 0.85rem;
+    }
+
+    /* Leaked Info in soft pink */
+    .leaked-container {
+      grid-column: 1 / -1;
+      background-color: #ffe4f0; /* soft pink highlight */
+      border: 1px solid #eee;
+      border-radius: 0.25rem;
+      padding: 10px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+      font-size: 0.85rem;
+      color: #333;
+      white-space: pre-wrap;
+      margin-top: 6px;
+    }
+
+    /*********************************
+     * TAGS
+     *********************************/
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fff;
+      margin-left: 6px;
+    }
+    .tag-verified {
+      background-color: #f7c7db; /* pastel pink */
+    }
+    .tag-unverified {
+      background-color: #d7c3ea; /* pastel purple */
+    }
+    .tag-rejected {
+      background-color: #f9e0e9; /* lighter pinkish */
+      color: #555;
+    }
+
+    /*********************************
+     * ERROR LOG
+     *********************************/
+    #errorLog {
+      margin-top: 1rem;
+    }
+    .error-message {
+      color: #cc4b4b;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    /*********************************
+     * ANIMATIONS
+     *********************************/
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /*********************************
+     * RESPONSIVE STYLES
+     *********************************/
+    @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex: none;
+      }
+      .main-content {
+        width: 100%;
+      }
+      .result-body {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header with icon -->
+  <header>
+    <img src="static/icon.png" alt="Icon" />
+    <h1>TruffleHog Explorer</h1>
+  </header>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- 1) LOAD DATA -->
+      <div class="sidebar-section">
+        <h2>Load Data</h2>
+        <div class="upload-group">
+          <input type="file" id="trufflehogFile" accept=".json" multiple class="file-input" />
+          <p>Select one or more TruffleHog JSON (NDJSON) files</p>
+        </div>
+      </div>
+
+      <!-- 1B) LOAD SESSION -->
+      <div class="sidebar-section">
+        <h2>Load Session</h2>
+        <div class="upload-group">
+          <input type="file" id="sessionFile" accept=".json" class="file-input" />
+          <p>Load previously saved session (JSON)</p>
+        </div>
+      </div>
+
+      <!-- 2) FILTERS -->
+      <div class="sidebar-section">
+        <h2>Filters</h2>
+        <div class="controls-container">
+          <div>
+            <label for="filterRepository">
+              Filter by Repository:
+              <span class="info-icon" title="Choose a specific repository or leave as All.">?</span>
+            </label>
+            <select id="filterRepository">
+              <option value="">All</option>
+            </select>
+          </div>
+          <div>
+            <label for="filterDetector">
+              Filter by Detector:
+              <span class="info-icon" title="Which type of secret detector flagged the finding?">?</span>
+            </label>
+            <select id="filterDetector">
+              <option value="">All</option>
+            </select>
+          </div>
+          <div>
+            <label for="filterFileName">
+              Filter by Uploaded File:
+              <span class="info-icon" title="Which JSON file the finding originated from.">?</span>
+            </label>
+            <select id="filterFileName">
+              <option value="">All</option>
+            </select>
+          </div>
+          <div>
+            <label for="filterVerified">
+              Filter by Verified:
+              <span class="info-icon" title="Show only Verified or Unverified secrets.">?</span>
+            </label>
+            <select id="filterVerified">
+              <option value="">All</option>
+              <option value="true">Verified</option>
+              <option value="false">Unverified</option>
+            </select>
+          </div>
+
+          <!-- FLATPICKR Range Input -->
+          <div>
+            <label for="filterDateRange">
+              Filter by Date Range:
+              <span class="info-icon" title="Pick a start and end date from the calendar.">?</span>
+            </label>
+            <input type="text" id="filterDateRange" placeholder="Select date range..." />
+          </div>
+
+          <!-- Sort -->
+          <div>
+            <label for="sortBy">Sort By:</label>
+            <select id="sortBy">
+              <option value="">No Sorting</option>
+              <option value="dateAsc">Date Asc</option>
+              <option value="dateDesc">Date Desc</option>
+              <option value="repoAsc">Repository Asc</option>
+              <option value="repoDesc">Repository Desc</option>
+              <option value="verifiedAsc">Verified First</option>
+              <option value="verifiedDesc">Unverified First</option>
+            </select>
+          </div>
+
+          <!-- Clear Filters Button -->
+          <div>
+            <button class="btn btn-danger" id="clearFiltersBtn">
+              <i class="bi bi-backspace-fill"></i> &nbspClear All Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3) ACTIONS -->
+      <div class="sidebar-section">
+        <h2>Actions</h2>
+
+        <!-- Batch Review -->
+        <div class="actions-group">
+          <h3>Batch Review</h3>
+          <div class="buttons-group">
+            <!-- Button: Reject All Filtered -->
+            <button class="btn btn-danger" id="rejectAllBtn">
+              <i class="bi bi-x-circle"></i> &nbspReject All Filtered
+            </button>
+            <!-- Button: Mark All Filtered Verified -->
+            <button class="btn btn-secondary" id="verifyAllBtn">
+              <i class="bi bi-check-circle"></i> &nbspVerify All Filtered
+            </button>
+          </div>
+        </div>
+
+        <!-- Visibility -->
+        <div class="actions-group">
+          <h3>Visibility</h3>
+          <div class="buttons-group">
+            <!-- Button: Show/Hide Rejected -->
+            <button class="btn btn-info" id="toggleRejectedBtn">
+              <i class="bi bi-eye-slash"></i> &nbspHide Rejected
+            </button>
+            <!-- Expand/Collapse All Cards -->
+            <button class="btn btn-info" id="expandAllBtn">
+              <i class="bi bi-arrows-collapse"></i> &nbspCollapse All
+            </button>
+          </div>
+        </div>
+
+        <!-- Export -->
+        <div class="actions-group">
+          <h3>Export</h3>
+          <div class="buttons-group">
+            <!-- Button: Export Verified -->
+            <button class="btn btn-warning" id="exportVerifiedBtn">
+              <i class="bi bi-download"></i> &nbspExport Verified
+            </button>
+            <!-- Button: Export Filtered -->
+            <button class="btn btn-warning" id="exportFilteredBtn">
+              <i class="bi bi-download"></i> &nbspExport Filtered
+            </button>
+          </div>
+        </div>
+
+        <!-- Session Backup -->
+        <div class="actions-group">
+          <h3>Session Backup</h3>
+          <div class="buttons-group">
+            <!-- Button: Save Session -->
+            <button class="btn btn-warning" id="saveSessionBtn">
+              <i class="bi bi-save"></i> &nbspSave Session
+            </button>
+          </div>
+        </div>
+
+      </div><!-- .sidebar-section -->
+    </div><!-- .sidebar -->
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <!-- Stats Container -->
+      <div class="stats-container">
+        <h2>Statistics</h2>
+        <!-- We have 8 stats now, so it forms a 4x2 grid. -->
+        <div class="stats-grid">
+          <div class="stats-detail">
+            <strong><i class="bi bi-card-list"></i> Total</strong>
+            <span id="totalFindings">0</span>
+          </div>
+          <div class="stats-detail">
+            <strong><i class="bi bi-github"></i> Repos</strong>
+            <span id="uniqueRepositories">0</span>
+          </div>
+          <div class="stats-detail">
+            <strong><i class="bi bi-search"></i> Detectors</strong>
+            <span id="uniqueDetectors">0</span>
+          </div>
+          <div class="stats-detail">
+            <strong><i class="bi bi-file-earmark-text"></i> Files</strong>
+            <span id="uniqueFiles">0</span>
+          </div>
+          <div class="stats-detail">
+            <strong><i class="bi bi-people-fill"></i> Authors</strong>
+            <span id="uniqueAuthors">0</span>
+          </div>
+          <div class="stats-detail">
+            <strong><i class="bi bi-calendar-event"></i> First Seen</strong>
+            <span id="firstSeen">N/A</span>
+          </div>
+          <div class="stats-detail">
+            <strong><i class="bi bi-calendar2-week"></i> Last Seen</strong>
+            <span id="lastSeen">N/A</span>
+          </div>
+          <!-- New 8th stat: Rejected -->
+          <div class="stats-detail">
+            <strong><i class="bi bi-archive-fill"></i> Rejected</strong>
+            <span id="rejectedCount">0</span>
+          </div>
+        </div>
+
+        <!-- Verified Stats -->
+        <div class="verification-stats">
+          <p>
+            <strong>Verified:</strong>
+            <span id="verifiedCount">0</span> |
+            <strong>Unverified:</strong>
+            <span id="unverifiedCount">0</span>
+          </p>
+          <div class="verification-bar-container">
+            <div class="verification-bar" id="verificationBar"></div>
+          </div>
+        </div>
+
+        <!-- Filtered Count -->
+        <div class="filtered-count" id="filteredCountDisplay">
+          Currently Displaying 0 / 0 Findings
+        </div>
+      </div>
+
+      <!-- Results Container -->
+      <div id="results-container"></div>
+
+      <!-- Error Log Container -->
+      <div id="errorLog"></div>
+    </div><!-- .main-content -->
+  </div><!-- .layout -->
+
+  <script>
+    /**************************************************************
+     * Initialize Flatpickr in "range" mode
+     **************************************************************/
+    let selectedDateRange = [null, null];
+    flatpickr("#filterDateRange", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      onClose: function(selectedDates) {
+        selectedDateRange = selectedDates;
+        applyFilters();
+      }
+    });
+
+    /**************************************************************
+     * DOM ELEMENTS
+     **************************************************************/
+    const trufflehogFile = document.getElementById('trufflehogFile');
+    const sessionFile = document.getElementById('sessionFile'); // for loading session
+
+    const toggleRejectedBtn = document.getElementById('toggleRejectedBtn');
+    const rejectAllBtn = document.getElementById('rejectAllBtn');
+    const verifyAllBtn = document.getElementById('verifyAllBtn');
+    const exportVerifiedBtn = document.getElementById('exportVerifiedBtn');
+    const exportFilteredBtn = document.getElementById('exportFilteredBtn');
+    const expandAllBtn = document.getElementById('expandAllBtn');
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    const saveSessionBtn = document.getElementById('saveSessionBtn'); // for saving session
+
+    // Filter elements
+    const filterRepository = document.getElementById('filterRepository');
+    const filterDetector = document.getElementById('filterDetector');
+    const filterFileName = document.getElementById('filterFileName');
+    const filterVerified = document.getElementById('filterVerified');
+    const sortBy = document.getElementById('sortBy');
+
+    // Stats elements
+    const totalFindingsSpan = document.getElementById('totalFindings');
+    const uniqueRepositoriesSpan = document.getElementById('uniqueRepositories');
+    const uniqueDetectorsSpan = document.getElementById('uniqueDetectors');
+    const uniqueFilesSpan = document.getElementById('uniqueFiles');
+    const uniqueAuthorsSpan = document.getElementById('uniqueAuthors');
+    const firstSeenSpan = document.getElementById('firstSeen');
+    const lastSeenSpan = document.getElementById('lastSeen');
+    const verificationBar = document.getElementById('verificationBar');
+    const verifiedCountSpan = document.getElementById('verifiedCount');
+    const unverifiedCountSpan = document.getElementById('unverifiedCount');
+    const rejectedCountSpan = document.getElementById('rejectedCount');
+    const filteredCountDisplay = document.getElementById('filteredCountDisplay');
+
+    const resultsContainer = document.getElementById('results-container');
+    const errorLog = document.getElementById('errorLog');
+
+    // Full results in memory
+    let allResults = [];
+    // Current filtered subset
+    let currentFilteredResults = [];
+
+    // statusesMap: { [uniqueId]: { Verified: bool, Rejected: bool } }
+    let statusesMap = {};
+
+    // Toggling Rejected display
+    let hideRejected = true;
+
+    // Expand/Collapse All toggle
+    let expandAllState = false;
+
+    /**************************************************************
+     * RESTORE STATUSES FROM LOCAL STORAGE (if any)
+     **************************************************************/
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const stored = localStorage.getItem('thStatuses');
+        if (stored) {
+          statusesMap = JSON.parse(stored);
+        }
+      } catch (e) {
+        console.warn('Error reading localStorage for statuses:', e);
+      }
+    });
+
+    /**************************************************************
+     * FILE UPLOAD HANDLER (TruffleHog data)
+     **************************************************************/
+    trufflehogFile.addEventListener('change', async (event) => {
+      resultsContainer.innerHTML = '';
+      errorLog.innerHTML = '';
+      allResults = [];
+      currentFilteredResults = [];
+
+      // Reset filter dropdowns
+      filterRepository.innerHTML = '<option value="">All</option>';
+      filterDetector.innerHTML = '<option value="">All</option>';
+      filterFileName.innerHTML = '<option value="">All</option>';
+
+      const files = event.target.files;
+      const parsePromises = [];
+
+      for (const file of files) {
+        const reader = new FileReader();
+        const promise = new Promise((resolve) => {
+          reader.onload = (e) => {
+            const text = e.target.result;
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l !== '');
+
+            const repoSet = new Set();
+            const detSet = new Set();
+            const fileSet = new Set();
+
+            lines.forEach((line, idx) => {
+              // skip lines that are not valid JSON
+              if (!line.startsWith('{') && !line.startsWith('[')) return;
+              try {
+                const parsed = JSON.parse(line);
+
+                // Create a short unique ID
+                const shortId = 'id' + Math.random().toString(36).substr(2, 6);
+
+                // Restore Verified/Rejected status if it exists
+                const oldStatus = statusesMap[shortId] || { Verified: false, Rejected: false };
+                parsed.Verified = oldStatus.Verified;
+                parsed.Rejected = oldStatus.Rejected;
+
+                parsed._id = shortId;
+                parsed._uploadedFile = file.name;
+                allResults.push(parsed);
+
+                // Track possible filter values
+                const repo = getNestedValue(parsed, 'SourceMetadata.Data.Github.repository');
+                if (repo) repoSet.add(repo);
+
+                const det = parsed.DetectorName;
+                if (det) detSet.add(det);
+
+                fileSet.add(file.name);
+
+              } catch (err) {
+                console.error(`Error parsing JSON in ${file.name} at line ${idx + 1}:`, err);
+                const errDiv = document.createElement('div');
+                errDiv.classList.add('error-message');
+                errDiv.textContent = `Error parsing JSON line ${idx + 1} in ${file.name}: ${err.message}`;
+                errorLog.appendChild(errDiv);
+              }
+            });
+
+            // Update dropdowns
+            repoSet.forEach(r => addOptionIfNotExists(filterRepository, r));
+            detSet.forEach(d => addOptionIfNotExists(filterDetector, d));
+            fileSet.forEach(f => addOptionIfNotExists(filterFileName, f));
+
+            resolve();
+          };
+          reader.onerror = () => {
+            const errDiv = document.createElement('div');
+            errDiv.classList.add('error-message');
+            errDiv.textContent = `Error reading file: ${file.name}`;
+            errorLog.appendChild(errDiv);
+            resolve();
+          };
+          reader.readAsText(file);
+        });
+        parsePromises.push(promise);
+      }
+
+      Promise.all(parsePromises).then(() => {
+        updateStats();
+        applyFilters();
+      });
+    });
+
+    /**************************************************************
+     * NEW CODE: LOAD SESSION FILE
+     **************************************************************/
+    sessionFile.addEventListener('change', async (event) => {
+      const files = event.target.files;
+      if (!files || !files.length) return;
+
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!Array.isArray(data)) {
+            throw new Error('Session file is not an array of findings.');
+          }
+
+          // Reset everything
+          allResults = [];
+          currentFilteredResults = [];
+          resultsContainer.innerHTML = '';
+          errorLog.innerHTML = '';
+
+          // Reset filter dropdowns
+          filterRepository.innerHTML = '<option value="">All</option>';
+          filterDetector.innerHTML = '<option value="">All</option>';
+          filterFileName.innerHTML = '<option value="">All</option>';
+
+          // Rebuild local data + statuses
+          data.forEach((item) => {
+            if (!item._id) {
+              // If somehow missing an ID, generate one
+              item._id = 'id' + Math.random().toString(36).substr(2, 6);
+            }
+            statusesMap[item._id] = {
+              Verified: !!item.Verified,
+              Rejected: !!item.Rejected
+            };
+            allResults.push(item);
+
+            // Add filter options
+            const repo = getNestedValue(item, 'SourceMetadata.Data.Github.repository');
+            if (repo) addOptionIfNotExists(filterRepository, repo);
+
+            const det = item.DetectorName;
+            if (det) addOptionIfNotExists(filterDetector, det);
+
+            const fName = item._uploadedFile;
+            if (fName) addOptionIfNotExists(filterFileName, fName);
+          });
+
+          // Store statuses in localStorage
+          storeStatuses();
+
+          // Done, update UI
+          updateStats();
+          applyFilters();
+          alert('Session loaded successfully!');
+        } catch (err) {
+          const errDiv = document.createElement('div');
+          errDiv.classList.add('error-message');
+          errDiv.textContent = `Error loading session file: ${err.message}`;
+          errorLog.appendChild(errDiv);
+        }
+      };
+      reader.readAsText(file);
+    });
+    /**************************************************************/
+
+    function addOptionIfNotExists(selectEl, value) {
+      for (let i = 0; i < selectEl.options.length; i++) {
+        if (selectEl.options[i].value === value) return;
+      }
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = value;
+      selectEl.appendChild(opt);
+    }
+
+    /**************************************************************
+     * STORE STATUSES
+     **************************************************************/
+    function storeStatuses() {
+      try {
+        localStorage.setItem('thStatuses', JSON.stringify(statusesMap));
+      } catch (e) {
+        console.warn('Unable to store statuses:', e);
+      }
+    }
+
+    /**************************************************************
+     * UPDATE STATS
+     **************************************************************/
+    function updateStats() {
+      totalFindingsSpan.textContent = allResults.length;
+
+      const repos = new Set(
+        allResults.map(r => getNestedValue(r, 'SourceMetadata.Data.Github.repository')).filter(Boolean)
+      );
+      uniqueRepositoriesSpan.textContent = repos.size;
+
+      const dets = new Set(allResults.map(r => r.DetectorName).filter(Boolean));
+      uniqueDetectorsSpan.textContent = dets.size;
+
+      const files = new Set(allResults.map(r => r._uploadedFile).filter(Boolean));
+      uniqueFilesSpan.textContent = files.size;
+
+      const authors = new Set(
+        allResults.map(r => getNestedValue(r, 'SourceMetadata.Data.Github.email')).filter(Boolean)
+      );
+      uniqueAuthorsSpan.textContent = authors.size;
+
+      const timestamps = allResults
+        .map(r => getNestedValue(r, 'SourceMetadata.Data.Github.timestamp'))
+        .map(ts => ts ? new Date(ts).getTime() : null)
+        .filter(x => x && !isNaN(x));
+      if (timestamps.length) {
+        const min = Math.min(...timestamps);
+        const max = Math.max(...timestamps);
+        firstSeenSpan.textContent = new Date(min).toLocaleDateString();
+        lastSeenSpan.textContent = new Date(max).toLocaleDateString();
+      } else {
+        firstSeenSpan.textContent = 'N/A';
+        lastSeenSpan.textContent = 'N/A';
+      }
+
+      const verifiedCount = allResults.filter(r => r.Verified).length;
+      const unverifiedCount = allResults.filter(r => !r.Verified).length;
+      verifiedCountSpan.textContent = verifiedCount;
+      unverifiedCountSpan.textContent = unverifiedCount;
+
+      const rejectedCount = allResults.filter(r => r.Rejected).length;
+      rejectedCountSpan.textContent = rejectedCount;
+
+      const total = verifiedCount + unverifiedCount;
+      if (total === 0) {
+        verificationBar.style.width = '0%';
+      } else {
+        const pct = (verifiedCount / total) * 100;
+        verificationBar.style.width = pct.toFixed(1) + '%';
+      }
+    }
+
+    /**************************************************************
+     * FILTER & SORT & RENDER
+     **************************************************************/
+    [
+      filterRepository, filterDetector, filterFileName, filterVerified, sortBy
+    ].forEach(el => el.addEventListener('change', applyFilters));
+
+    function applyFilters() {
+      const repoVal = filterRepository.value;
+      const detVal = filterDetector.value;
+      const fileVal = filterFileName.value;
+      const verVal = filterVerified.value;
+
+      let [startTime, endTime] = [null, null];
+      if (selectedDateRange.length === 2 && selectedDateRange[0] && selectedDateRange[1]) {
+        startTime = selectedDateRange[0].getTime();
+        endTime = selectedDateRange[1].getTime();
+        if (startTime > endTime) {
+          const tmp = startTime;
+          startTime = endTime;
+          endTime = tmp;
+        }
+      }
+
+      const filtered = allResults.filter(r => {
+        // Hide rejected if toggled
+        if (hideRejected && r.Rejected) return false;
+
+        let verifiedMatch = true;
+        if (verVal === 'true') verifiedMatch = (r.Verified === true);
+        if (verVal === 'false') verifiedMatch = (r.Verified === false);
+
+        const repoMatch = !repoVal || (getNestedValue(r, 'SourceMetadata.Data.Github.repository') === repoVal);
+        const detMatch = !detVal || (r.DetectorName === detVal);
+        const fileMatch = !fileVal || (r._uploadedFile === fileVal);
+
+        const tsStr = getNestedValue(r, 'SourceMetadata.Data.Github.timestamp');
+        const tsMs = tsStr ? new Date(tsStr).getTime() : null;
+        const dateMatch = (!startTime || (tsMs && tsMs >= startTime)) &&
+                          (!endTime || (tsMs && tsMs <= endTime));
+
+        return verifiedMatch && repoMatch && detMatch && fileMatch && dateMatch;
+      });
+
+      // Sort results
+      const sortValue = sortBy.value;
+      if (sortValue) {
+        filtered.sort((a, b) => {
+          const getTime = (item) => {
+            const t = getNestedValue(item, 'SourceMetadata.Data.Github.timestamp');
+            return t ? new Date(t).getTime() : 0;
+          };
+          const repoA = getNestedValue(a, 'SourceMetadata.Data.Github.repository') || '';
+          const repoB = getNestedValue(b, 'SourceMetadata.Data.Github.repository') || '';
+
+          switch (sortValue) {
+            case 'dateAsc':    return getTime(a) - getTime(b);
+            case 'dateDesc':   return getTime(b) - getTime(a);
+            case 'repoAsc':    return repoA.localeCompare(repoB);
+            case 'repoDesc':   return repoB.localeCompare(repoA);
+            case 'verifiedAsc':
+              // move verified to top => so the 'lowest' is unverified
+              return (b.Verified ? 1 : 0) - (a.Verified ? 1 : 0);
+            case 'verifiedDesc':
+              // move unverified to top => so the 'lowest' is verified
+              return (a.Verified ? 1 : 0) - (b.Verified ? 1 : 0);
+            default:
+              return 0;
+          }
+        });
+      }
+
+      currentFilteredResults = filtered;
+      renderResults(filtered);
+      filteredCountDisplay.textContent = `Currently Displaying ${filtered.length} / ${allResults.length} Findings`;
+    }
+
+    function renderResults(results) {
+      resultsContainer.innerHTML = '';
+      if (!results.length) {
+        resultsContainer.innerHTML = '<p>No results match the current filters.</p>';
+        return;
+      }
+      results.forEach((res) => {
+        const card = createResultCard(res);
+        resultsContainer.appendChild(card);
+      });
+    }
+
+    /**************************************************************
+     * CREATE RESULT CARD
+     **************************************************************/
+    function createResultCard(result) {
+      // By default, all cards are uncollapsed => no "collapsed" class initially
+      const container = document.createElement('div');
+      container.classList.add('result-container');
+
+      // Header
+      const header = document.createElement('div');
+      header.classList.add('result-header');
+
+      // Title
+      const titleDiv = document.createElement('div');
+      titleDiv.classList.add('title');
+      titleDiv.textContent = `Finding ID: ${result._id}`;
+      header.appendChild(titleDiv);
+
+      // Action buttons (in header)
+      const actionsDiv = document.createElement('div');
+      actionsDiv.style.display = 'flex';
+      actionsDiv.style.gap = '10px';
+
+      const rejectBtn = document.createElement('button');
+      rejectBtn.classList.add('btn', 'btn-danger');
+      rejectBtn.innerHTML = '<i class="bi bi-x-circle"></i> &nbspReject';
+      rejectBtn.title = "Reject this finding";
+      rejectBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        result.Rejected = true;
+        statusesMap[result._id] = {
+          Verified: result.Verified,
+          Rejected: true
+        };
+        storeStatuses();
+        updateStats();
+        applyFilters();
+      });
+      actionsDiv.appendChild(rejectBtn);
+
+      const verifyBtn = document.createElement('button');
+      verifyBtn.classList.add('btn', 'btn-secondary');
+      verifyBtn.innerHTML = '<i class="bi bi-check-circle"></i> &nbspVerify';
+      verifyBtn.title = "Mark this finding as verified";
+      verifyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        result.Verified = true;
+        statusesMap[result._id] = {
+          Verified: true,
+          Rejected: result.Rejected
+        };
+        storeStatuses();
+        updateStats();
+        applyFilters();
+      });
+      actionsDiv.appendChild(verifyBtn);
+
+      header.appendChild(actionsDiv);
+
+      // Toggle collapse/expand on header click
+      header.addEventListener('click', () => {
+        container.classList.toggle('collapsed');
+      });
+
+      container.appendChild(header);
+
+      // Collapsed summary line
+      const summaryLine = document.createElement('div');
+      summaryLine.classList.add('summary-line');
+      const linkVal = getNestedValue(result, 'SourceMetadata.Data.Github.link')
+        || getNestedValue(result, 'SourceMetadata.Data.Github.file')
+        || 'N/A';
+      const detVal = result.DetectorName || 'N/A';
+      let rawShort = (result.Raw || '').slice(0, 50);
+      if (rawShort.length === 50) rawShort += '...';
+      summaryLine.innerHTML = `
+        <strong>Detector:</strong> ${detVal} &mdash;
+        <strong>Path:</strong> ${linkVal} &mdash;
+        <strong>Snippet:</strong> ${rawShort}
+      `;
+      container.appendChild(summaryLine);
+
+      // Full body
+      const body = document.createElement('div');
+      body.classList.add('result-body');
+
+      // 1) Path
+      body.appendChild(createDetail('Path:', linkVal.startsWith('http')
+        ? `<a href="${linkVal}" target="_blank">${linkVal}</a>` : linkVal));
+
+      // 2) File
+      body.appendChild(createDetail('Uploaded File:', result._uploadedFile || 'N/A'));
+
+      // 3) Repository
+      const repoVal = getNestedValue(result, 'SourceMetadata.Data.Github.repository') || 'N/A';
+      body.appendChild(createDetail('Repository:', repoVal));
+
+      // 4) Commit
+      const commitVal = getNestedValue(result, 'SourceMetadata.Data.Github.commit') || 'N/A';
+      body.appendChild(createDetail('Commit:', commitVal));
+
+      // 5) Date
+      const timeVal = getNestedValue(result, 'SourceMetadata.Data.Github.timestamp') || 'N/A';
+      body.appendChild(createDetail('Date:', timeVal));
+
+      // 6) Author
+      const authorVal = getNestedValue(result, 'SourceMetadata.Data.Github.email') || 'N/A';
+      body.appendChild(createDetail('Author:', authorVal));
+
+      // 7) Detector
+      body.appendChild(createDetail('Detector:', detVal));
+
+      // 8) DetectorDescription
+      const descVal = result.DetectorDescription || 'N/A';
+      body.appendChild(createDetail('Description:', descVal));
+
+      // Verified
+      const verifiedTag = result.Verified
+        ? `<i class="bi bi-check-circle-fill"></i> <span class="tag tag-verified">Verified</span>`
+        : `<i class="bi bi-x-circle-fill"></i> <span class="tag tag-unverified">Not Verified</span>`;
+      body.appendChild(createDetail('Verified:', verifiedTag));
+
+      // Rejected
+      const rejectedTag = result.Rejected
+        ? `<i class="bi bi-x-circle-fill"></i> <span class="tag tag-rejected">Rejected</span>`
+        : 'No';
+      body.appendChild(createDetail('Rejected:', rejectedTag));
+
+      // Leaked Info
+      const leakedInfoDiv = document.createElement('div');
+      leakedInfoDiv.classList.add('leaked-container');
+      const rawVal = result.Raw || 'N/A';
+
+      if (rawVal.length > 300) {
+        const originalText = rawVal;
+        const previewText = rawVal.slice(0, 300) + '...';
+        leakedInfoDiv.innerHTML = `<strong>Leaked Information:</strong>\n${previewText}`;
+
+        const toggleLink = document.createElement('button');
+        toggleLink.textContent = 'Show More';
+        toggleLink.classList.add('btn', 'btn-info');
+        toggleLink.style.marginTop = '10px';
+
+        let expanded = false;
+        toggleLink.addEventListener('click', (e) => {
+          e.stopPropagation();
+          expanded = !expanded;
+          leakedInfoDiv.innerHTML = `<strong>Leaked Information:</strong>\n${expanded ? originalText : previewText}`;
+          toggleLink.textContent = expanded ? 'Show Less' : 'Show More';
+          leakedInfoDiv.appendChild(toggleLink);
+        });
+        leakedInfoDiv.appendChild(toggleLink);
+      } else {
+        leakedInfoDiv.innerHTML = `<strong>Leaked Information:</strong>\n${rawVal}`;
+      }
+      body.appendChild(leakedInfoDiv);
+
+      container.appendChild(body);
+      return container;
+    }
+
+    function createDetail(label, valueHTML) {
+      const div = document.createElement('div');
+      div.classList.add('result-detail');
+      div.innerHTML = `<strong>${label}</strong> ${valueHTML}`;
+      return div;
+    }
+
+    /**************************************************************
+     * SHOW/HIDE REJECTED
+     **************************************************************/
+    toggleRejectedBtn.addEventListener('click', () => {
+      hideRejected = !hideRejected;
+      toggleRejectedBtn.innerHTML = hideRejected
+        ? '<i class="bi bi-eye-slash"></i> Hide Rejected'
+        : '<i class="bi bi-eye"></i> Show Rejected';
+      applyFilters();
+    });
+
+    /**************************************************************
+     * MASS UPDATE (Reject or Verify)
+     **************************************************************/
+    rejectAllBtn.addEventListener('click', () => {
+      massUpdateFiltered({ Reject: true });
+    });
+    verifyAllBtn.addEventListener('click', () => {
+      massUpdateFiltered({ Verify: true });
+    });
+    function massUpdateFiltered(action) {
+      for (const r of allResults) {
+        // Only affect the currently filtered set
+        if (!currentFilteredResults.includes(r)) continue;
+        if (action.Reject) r.Rejected = true;
+        if (action.Verify) r.Verified = true;
+        statusesMap[r._id] = {
+          Verified: r.Verified,
+          Rejected: r.Rejected
+        };
+      }
+      storeStatuses();
+      updateStats();
+      applyFilters();
+    }
+
+    /**************************************************************
+     * EXPORT RESULTS (Verified, Filtered, etc.)
+     **************************************************************/
+    exportVerifiedBtn.addEventListener('click', () => {
+      const verifiedOnly = allResults.filter(r => r.Verified);
+      if (!verifiedOnly.length) {
+        alert("No verified results to export!");
+        return;
+      }
+      downloadJsonFile(verifiedOnly, "verified_findings.json");
+    });
+
+    exportFilteredBtn.addEventListener('click', () => {
+      if (!currentFilteredResults.length) {
+        alert("No filtered results to export!");
+        return;
+      }
+      downloadJsonFile(currentFilteredResults, "filtered_findings.json");
+    });
+
+    function downloadJsonFile(dataArray, filename) {
+      const blob = new Blob([JSON.stringify(dataArray, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    /**************************************************************
+     * NEW CODE: SAVE CURRENT SESSION
+     * Exports the entire 'allResults' array (with statuses)
+     **************************************************************/
+    saveSessionBtn.addEventListener('click', () => {
+      if (!allResults.length) {
+        alert("No data loaded to save!");
+        return;
+      }
+      // The entire array includes Verified/Rejected flags
+      downloadJsonFile(allResults, "session_backup.json");
+    });
+
+    /**************************************************************
+     * EXPAND/COLLAPSE ALL
+     **************************************************************/
+    expandAllBtn.addEventListener('click', () => {
+      const cards = document.querySelectorAll('.result-container');
+      if (!expandAllState) {
+        cards.forEach(card => card.classList.add('collapsed'));
+        expandAllBtn.innerHTML = '<i class="bi bi-arrows-expand"></i> Expand All';
+      } else {
+        cards.forEach(card => card.classList.remove('collapsed'));
+        expandAllBtn.innerHTML = '<i class="bi bi-arrows-collapse"></i> Collapse All';
+      }
+      expandAllState = !expandAllState;
+    });
+
+    /**************************************************************
+     * CLEAR ALL FILTERS
+     **************************************************************/
+    clearFiltersBtn.addEventListener('click', () => {
+      filterRepository.value = '';
+      filterDetector.value = '';
+      filterFileName.value = '';
+      filterVerified.value = '';
+      sortBy.value = '';
+
+      selectedDateRange = [null, null];
+      const dateInput = document.getElementById('filterDateRange');
+      if (dateInput._flatpickr) {
+        dateInput._flatpickr.clear();
+      }
+
+      applyFilters();
+    });
+
+    /**************************************************************
+     * HELPER: getNestedValue
+     **************************************************************/
+    function getNestedValue(obj, path) {
+      if (!obj) return undefined;
+      return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    }
+  </script>
+</body>
+</html>
