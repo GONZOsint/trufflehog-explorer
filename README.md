@@ -1,11 +1,12 @@
 # TruffleHog Explorer 🕵️‍♂️
 
-Welcome to **TruffleHog Explorer**, a user-friendly web-based tool to visualize and analyze data extracted using [TruffleHog](https://github.com/trufflesecurity/trufflehog). TruffleHog is one of the most powerful secrets discovery, classification, validation, and analysis open source tool. In this context, a secret refers to a credential a machine uses to authenticate itself to another machine. This includes API keys, database passwords, private encryption keys, and more.
+Welcome to [**TruffleHog Explorer**](gonzosint.github.io/trufflehog-explorer/), a user-friendly web-based tool to visualize and analyze data extracted using [TruffleHog](https://github.com/trufflesecurity/trufflehog). TruffleHog is one of the most powerful secrets discovery, classification, validation, and analysis open source tool. In this context, a secret refers to a credential a machine uses to authenticate itself to another machine. This includes API keys, database passwords, private encryption keys, and more.
 
 With an improved UI/UX, powerful filtering options, and export capabilities, this tool helps security professionals efficiently review potential secrets and credentials found in their repositories.
 
 > ⚠️ This dashboard has been tested only with GitHub TruffleHog JSON outputs. Expect updates soon to support additional formats and platforms.
 
+You can use online version here: [**TruffleHog Explorer**](gonzosint.github.io/trufflehog-explorer/)
 
 ![TruffleHog Explorer Screenshot](static/screenshot.png)
 
@@ -34,6 +35,7 @@ With an improved UI/UX, powerful filtering options, and export capabilities, thi
 ---
 
 ## 📥 Installation & Usage
+
 
 ### 1. Clone the Repository
 ```bash
